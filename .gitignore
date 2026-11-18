@@ -8,3 +8,6 @@ coverage/
 .DS_Store
 *.log
 .vite/
+
+# Supabase CLI temporary files
+supabase/.temp/

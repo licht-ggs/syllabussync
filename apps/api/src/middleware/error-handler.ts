@@ -12,7 +12,9 @@ export const errorHandler: ErrorRequestHandler = (error, _request, response, _ne
       : 500;
 
   if (status === 500) {
-    console.error(error);
+    console.error("Unhandled API error", {
+      name: error instanceof Error ? error.name : "UnknownError",
+    });
   }
 
   response.status(status).json({

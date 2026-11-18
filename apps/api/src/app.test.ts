@@ -17,6 +17,13 @@ describe("API", () => {
     expect(response.body).toEqual({ error: "Not found" });
   });
 
+  it("requires authentication for profile access", async () => {
+    const response = await request(app).get("/api/profile");
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual({ error: "Authentication required" });
+  });
+
   it("handles malformed JSON with a client error response", async () => {
     const response = await request(app)
       .post("/api/unknown")

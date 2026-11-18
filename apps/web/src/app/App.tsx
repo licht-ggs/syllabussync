@@ -1,29 +1,101 @@
-import { Link, Route, Routes } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { useAuth } from "../features/auth/useAuth";
+import { AuthCallbackPage } from "../features/auth/pages/AuthCallbackPage";
+import { ForgotPasswordPage } from "../features/auth/pages/ForgotPasswordPage";
+import { ResetPasswordPage } from "../features/auth/pages/ResetPasswordPage";
+import { SignInPage } from "../features/auth/pages/SignInPage";
+import { SignUpPage } from "../features/auth/pages/SignUpPage";
+import { VerificationPendingPage } from "../features/auth/pages/VerificationPendingPage";
+import { needsEmailVerification } from "../features/auth/auth-utils";
+import { DashboardPage } from "../features/dashboard/DashboardPage";
 
-function HomePage() {
+function LoadingPage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center px-6 py-16">
-      <p className="text-sm font-semibold tracking-wide text-slate-500">
-        SYLLABUSSYNC
+    <main className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
+      <p className="text-sm text-slate-600" role="status">
+        Loading your session…
       </p>
-      <h1 className="mt-3 text-4xl font-semibold tracking-tight text-slate-900">
-        Understand your workload. Own your semester.
-      </h1>
-      <p className="mt-4 max-w-xl text-lg leading-7 text-slate-600">
-        Your academic workload workspace is being prepared.
-      </p>
-      <Link className="mt-8 w-fit text-sm font-medium text-slate-700 underline" to="/">
-        Home
-      </Link>
     </main>
+  );
+}
+
+function PublicOnly() {
+  const { isLoading, session } = useAuth();
+
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+
+  if (session) {
+    return (
+      <Navigate
+        replace
+        to={needsEmailVerification(session.user) ? "/auth/verify" : "/dashboard"}
+      />
+    );
+  }
+
+  return <Outlet />;
+}
+
+function RequireAuth() {
+  const { isLoading, session } = useAuth();
+
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+
+  if (!session) {
+    return <Navigate replace to="/sign-in" />;
+  }
+
+  if (needsEmailVerification(session.user)) {
+    return (
+      <Navigate
+        replace
+        to="/auth/verify"
+        state={{ email: session.user.email ?? "" }}
+      />
+    );
+  }
+
+  return <Outlet />;
+}
+
+function RootRedirect() {
+  const { isLoading, session } = useAuth();
+
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+
+  if (!session) {
+    return <Navigate replace to="/sign-in" />;
+  }
+
+  return (
+    <Navigate
+      replace
+      to={needsEmailVerification(session.user) ? "/auth/verify" : "/dashboard"}
+    />
   );
 }
 
 export function App() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="*" element={<HomePage />} />
+      <Route element={<PublicOnly />}>
+        <Route path="/sign-in" element={<SignInPage />} />
+        <Route path="/sign-up" element={<SignUpPage />} />
+        <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+      </Route>
+      <Route path="/auth/verify" element={<VerificationPendingPage />} />
+      <Route path="/auth/callback" element={<AuthCallbackPage />} />
+      <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+      <Route element={<RequireAuth />}>
+        <Route path="/dashboard" element={<DashboardPage />} />
+      </Route>
+      <Route path="*" element={<RootRedirect />} />
     </Routes>
   );
 }

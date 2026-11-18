@@ -6,7 +6,7 @@
     "node": ">=26"
   },
   "scripts": {
-    "dev": "pnpm --parallel --filter @syllabussync/web --filter @syllabussync/api dev",
+    "dev": "pnpm --filter @syllabussync/shared build && pnpm --parallel --filter @syllabussync/web --filter @syllabussync/api dev:server",
     "dev:web": "pnpm --filter @syllabussync/web dev",
     "dev:api": "pnpm --filter @syllabussync/api dev",
     "build": "pnpm -r build",
