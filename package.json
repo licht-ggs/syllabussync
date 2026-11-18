@@ -1,0 +1,29 @@
+{
+  "name": "syllabussync",
+  "private": true,
+  "packageManager": "pnpm@12.21.0",
+  "engines": {
+    "node": ">=26"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @syllabussync/web --filter @syllabussync/api dev",
+    "dev:web": "pnpm --filter @syllabussync/web dev",
+    "dev:api": "pnpm --filter @syllabussync/api dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm --filter @syllabussync/shared build && pnpm -r typecheck",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "pnpm --filter @syllabussync/shared build && pnpm -r --if-present test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "eslint": "^9.39.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.5.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.0"
+  }
+}
