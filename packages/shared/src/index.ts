@@ -1,4 +1,27 @@
 export {
+  academicPeriodCreateSchema,
+  academicPeriodDeletionResultSchema,
+  academicPeriodSchema,
+  academicPeriodUpdateSchema,
+  academicWorkspaceSchema,
+  academicYearDeletionResultSchema,
+  academicYearInputSchema,
+  academicYearSchema,
+  deleteAcademicPeriodInputSchema,
+  deleteAcademicYearInputSchema,
+  deleteSubjectInputSchema,
+  subjectCreateSchema,
+  subjectDeletionResultSchema,
+  subjectSchema,
+  subjectUpdateSchema,
+} from "./schemas/academic.js";
+export type {
+  AcademicPeriod,
+  AcademicWorkspace,
+  AcademicYear,
+  Subject,
+} from "./schemas/academic.js";
+export {
   forgotPasswordSchema,
   profileSchema,
   resetPasswordSchema,

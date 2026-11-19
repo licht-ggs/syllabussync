@@ -24,6 +24,13 @@ describe("API", () => {
     expect(response.body).toEqual({ error: "Authentication required" });
   });
 
+  it("requires authentication for academic workspace access", async () => {
+    const response = await request(app).get("/api/academic/workspace");
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual({ error: "Authentication required" });
+  });
+
   it("handles malformed JSON with a client error response", async () => {
     const response = await request(app)
       .post("/api/unknown")

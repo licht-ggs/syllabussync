@@ -29,9 +29,56 @@ defaults to port 3000 and serves `GET /api/health`.
 
 ## Supabase Auth setup
 
-The migration in `supabase/migrations` creates profiles, an Auth user trigger,
-and owner-only RLS policies. Apply it with the Supabase CLI after linking the
-intended project and reviewing the migration.
+The migrations in `supabase/migrations` create profiles and the academic
+workspace tables, functions, triggers, and RLS policies. Review migrations
+before applying them. For local database verification, start the local Supabase
+stack, apply migrations, and run pgTAP only against that isolated local
+database:
+
+```sh
+supabase start
+supabase db reset
+supabase test db
+```
+
+`supabase db reset` is destructive to its target database. Do not run it
+against a hosted project. The Phase 1.3 academic migration has not been applied
+to hosted Supabase; do not treat code-level checks as database verification.
+
+### Local Google OAuth
+
+The local Supabase configuration enables Google OAuth and uses
+`http://localhost:5173` as its Auth site URL. It allows the callback URLs for
+the current Vite origin, including signup and recovery callback flows. The
+Google provider's Client ID and Client Secret are read only by the local
+Supabase CLI process through these environment variables:
+
+- `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID`
+- `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET`
+
+Set them in the shell used to start/restart the local stack; do not add them to
+the repository, root `.env`, or hosted Supabase configuration. For example,
+the prompts below do not echo the values:
+
+```sh
+read -r -s -p "Local Google OAuth Client ID: " SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID
+printf '\n'
+read -r -s -p "Local Google OAuth Client Secret: " SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET
+printf '\n'
+export SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET
+```
+
+After changing `supabase/config.toml`, restart the local stack for the
+configuration to take effect. Do not reset the local database just to enable
+OAuth.
+
+In Google Cloud Console, configure the OAuth client as a **Web application**:
+
+- Authorized JavaScript origin: `http://localhost:5173`
+- Authorized redirect URI: `http://127.0.0.1:54321/auth/v1/callback`
+
+The Google redirect URI is the local Supabase Auth callback, not the Vite
+`/auth/callback` route. SyllabusSync then redirects back to that Vite callback.
 
 For a hosted Supabase project, configure these settings manually in the
 Dashboard; they are not configured by this repository:
@@ -58,9 +105,10 @@ providers may merge identities contrary to the Phase 1.2 policy. See the
 [authentication architecture](../architecture/PHASE_1_2_AUTHENTICATION.md) for
 the password-recovery and server-side enforcement limitation.
 
-The app never accepts a user-supplied return URL. Google credentials remain in
-the Supabase Dashboard; do not put them in `.env` or source control. Configure
-the Supabase Dashboard before attempting hosted authentication.
+The app never accepts a user-supplied return URL. Hosted Google credentials
+remain in the Supabase Dashboard and must not be added to `.env` or source
+control. The local environment variables above configure only the local
+Supabase stack.
 
 ## Troubleshooting
 

@@ -85,13 +85,21 @@ and [email_identity_on_password_test.go](https://github.com/supabase/auth/blob/1
 
 ## External setup
 
-Google provider credentials, hosted email-confirmation policy, site URL,
-callback redirect allowlist, and confirmation/recovery email templates must be
-configured in the Supabase Dashboard. No hosted-project settings were changed
-or verified as part of this implementation. See
+The local Supabase config enables only the Google OAuth provider, uses
+environment references for its Client ID and Client Secret, and allows the
+Vite callback at `http://localhost:5173/auth/callback`. Google Cloud Console
+must authorize `http://localhost:5173` as a JavaScript origin and
+`http://127.0.0.1:54321/auth/v1/callback` as the redirect URI for the local
+Supabase Auth service.
+
+Hosted Google credentials, email-confirmation policy, site URL, callback
+redirect allowlist, and confirmation/recovery templates remain separate
+settings configured in the Supabase Dashboard. No hosted-project settings
+were changed or verified as part of the local setup. See
 [LOCAL_SETUP.md](../development/LOCAL_SETUP.md).
 
-## Out of scope
+## Phase boundary
 
-No academic profile onboarding, academic data, or dashboard features beyond a
-minimal authenticated profile placeholder are included.
+Phase 1.2 does not require academic profile onboarding or institution details.
+The later Phase 1.3 academic workspace is documented separately in
+[PHASE_1_3_ACADEMIC_WORKSPACE.md](./PHASE_1_3_ACADEMIC_WORKSPACE.md).

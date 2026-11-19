@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { profileSchema, type Profile } from "@syllabussync/shared";
 import { useAuth } from "../auth/useAuth";
-import { AuthLayout, FormMessage } from "../auth/components/AuthLayout";
-import { SubmitButton } from "../auth/components/AuthFields";
+import { FormMessage } from "../auth/components/AuthLayout";
+import { AcademicWorkspace } from "./AcademicWorkspace";
 
 export function DashboardPage() {
   const { client, session } = useAuth();
@@ -63,7 +63,9 @@ export function DashboardPage() {
     void loadProfile()
       .catch(() => {
         if (active) {
-          setErrorMessage("Your profile could not be loaded. Please try again.");
+          setErrorMessage(
+            "Your profile could not be loaded. Please try again.",
+          );
         }
       })
       .finally(() => {
@@ -96,36 +98,40 @@ export function DashboardPage() {
   }
 
   return (
-    <AuthLayout
-      description="Your academic workspace is ready when you are."
-      title="Welcome to SyllabusSync"
-    >
-      {profile && (
-        <p className="mt-5 text-sm text-slate-700">
-          Signed in as <span className="font-semibold">{profile.display_name}</span>
-        </p>
-      )}
-      {isLoading && (
-        <p className="mt-5 text-sm text-slate-600" role="status">
-          Loading your profile…
-        </p>
-      )}
-      {errorMessage && <FormMessage kind="error">{errorMessage}</FormMessage>}
-      <p className="mt-5 text-sm text-slate-600">
-        This is a minimal authenticated placeholder. Academic planning features
-        will arrive in a later phase.
-      </p>
-      <form
-        className="mt-6"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void handleSignOut();
-        }}
-      >
-        <SubmitButton disabled={isSigningOut}>
-          {isSigningOut ? "Signing out…" : "Sign out"}
-        </SubmitButton>
-      </form>
-    </AuthLayout>
+    <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl">
+        <header className="mb-8 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold tracking-wide text-slate-500">
+              SYLLABUSSYNC
+            </p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
+              Academic workspace
+            </h1>
+            {profile && (
+              <p className="mt-2 text-sm text-slate-700">
+                Signed in as{" "}
+                <span className="font-semibold">{profile.display_name}</span>
+              </p>
+            )}
+            {isLoading && (
+              <p className="mt-2 text-sm text-slate-600" role="status">
+                Loading your profile…
+              </p>
+            )}
+          </div>
+          <button
+            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-100 disabled:opacity-60"
+            disabled={isSigningOut}
+            onClick={() => void handleSignOut()}
+            type="button"
+          >
+            {isSigningOut ? "Signing out…" : "Sign out"}
+          </button>
+        </header>
+        {errorMessage && <FormMessage kind="error">{errorMessage}</FormMessage>}
+        <AcademicWorkspace />
+      </div>
+    </main>
   );
 }

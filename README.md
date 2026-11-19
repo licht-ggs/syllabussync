@@ -2,11 +2,10 @@
 
 **Understand your workload. Own your semester.**
 
-SyllabusSync is an AI-powered academic workload management platform for
-university and college students. This repository contains the Phase 1.1
-infrastructure foundation and Phase 1.2 authentication: a React/Vite
-application, an Express API, shared TypeScript contracts, Supabase Auth, and a
-row-level-secured student profile.
+SyllabusSync is an academic workspace for students. This repository contains
+the Phase 1.1 infrastructure foundation, Phase 1.2 authentication, and the
+Phase 1.3 academic workspace: a React/Vite application, an Express API, shared
+TypeScript contracts, Supabase Auth, and a row-level-secured student workspace.
 
 ## Quick start
 
@@ -27,13 +26,15 @@ Dashboard; see [docs/development/LOCAL_SETUP.md](docs/development/LOCAL_SETUP.md
 
 ## Workspace
 
-- `apps/web` — React, TypeScript, Vite, Tailwind, authentication routes, and a
-  minimal protected placeholder.
-- `apps/api` — Express API, environment validation, health and authenticated
-  profile routes.
-- `packages/shared` — shared Zod validation and profile contracts.
-- `supabase` — CLI configuration, profile migration, and RLS tests.
+- `apps/web` — React, TypeScript, Vite, Tailwind, authentication routes, and the
+  protected academic workspace.
+- `apps/api` — Express API, environment validation, health, profile, and
+  authenticated academic RPC routes.
+- `packages/shared` — shared Zod validation and profile/academic contracts.
+- `supabase` — CLI configuration, profile and academic migrations, and RLS/
+  pgTAP tests.
 
 See [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md),
 [docs/architecture/PHASE_1_2_AUTHENTICATION.md](docs/architecture/PHASE_1_2_AUTHENTICATION.md),
+[docs/architecture/PHASE_1_3_ACADEMIC_WORKSPACE.md](docs/architecture/PHASE_1_3_ACADEMIC_WORKSPACE.md),
 and [CONTRIBUTING.md](CONTRIBUTING.md).
