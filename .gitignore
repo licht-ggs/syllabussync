@@ -11,3 +11,6 @@ coverage/
 
 # Supabase CLI temporary files
 supabase/.temp/
+
+# Local Supabase CLI state
+supabase/.branches/
