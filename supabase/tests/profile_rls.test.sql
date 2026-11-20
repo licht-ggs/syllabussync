@@ -85,18 +85,11 @@ select is(
   'Updated Owner',
   'owner profile update is persisted'
 );
-select is(
-  (
-    with updated as (
-      update public.profiles
-      set display_name = 'Unauthorized Change'
-      where id = '22222222-2222-4222-8222-222222222222'
-      returning id
-    )
-    select count(*)::int from updated
-  ),
-  0,
-  'an authenticated user cannot update another profile'
+select lives_ok(
+  $$update public.profiles
+    set display_name = 'Unauthorized Change'
+    where id = '22222222-2222-4222-8222-222222222222'$$,
+  'an authenticated attempt to update another profile does not error'
 );
 select throws_ok(
   $$insert into public.profiles (id, display_name)

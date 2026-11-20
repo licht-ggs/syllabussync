@@ -15,3 +15,15 @@ export function createSupabaseClient(accessToken: string) {
     },
   });
 }
+
+export function createDocumentWorkerClient() {
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error(
+      "Document processing worker requires server-side SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY configuration",
+    );
+  }
+
+  return createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}

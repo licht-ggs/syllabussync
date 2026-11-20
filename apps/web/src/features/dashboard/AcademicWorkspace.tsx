@@ -125,7 +125,7 @@ async function sendRequest(
   return payload;
 }
 
-export function AcademicWorkspace() {
+export function AcademicWorkspace({ view = "workspace" }: { view?: "workspace" | "archive" }) {
   const { session } = useAuth();
   const accessToken = session?.access_token;
   const [workspace, setWorkspace] = useState<AcademicWorkspace | null>(null);
@@ -140,6 +140,9 @@ export function AcademicWorkspace() {
   const [periodStartDate, setPeriodStartDate] = useState("");
   const [periodEndDate, setPeriodEndDate] = useState("");
   const [makeFirstPeriodCurrent, setMakeFirstPeriodCurrent] = useState(false);
+  const [isYearFormOpen, setIsYearFormOpen] = useState(true);
+  const [isPeriodFormOpen, setIsPeriodFormOpen] = useState(true);
+  const [isSubjectFormOpen, setIsSubjectFormOpen] = useState(true);
   const [editingPeriodId, setEditingPeriodId] = useState<string | null>(null);
   const [subjectName, setSubjectName] = useState("");
   const [subjectCode, setSubjectCode] = useState("");
@@ -293,6 +296,7 @@ export function AcademicWorkspace() {
     if (saved) {
       setYearName("");
       setEditingYearId(null);
+      setIsYearFormOpen(false);
     }
   }
 
@@ -365,6 +369,7 @@ export function AcademicWorkspace() {
       setPeriodStartDate("");
       setPeriodEndDate("");
       setMakeFirstPeriodCurrent(false);
+      setIsPeriodFormOpen(false);
     } catch (error) {
       const creationCompleted = createdPeriod !== null;
       const currentSelectionFailed =
@@ -449,11 +454,13 @@ export function AcademicWorkspace() {
   }
 
   function beginEditYear(year: AcademicYear) {
+    setIsYearFormOpen(true);
     setEditingYearId(year.id);
     setYearName(year.name);
   }
 
   function beginEditPeriod(period: AcademicPeriod) {
+    setIsPeriodFormOpen(true);
     setEditingPeriodId(period.id);
     setPeriodName(period.name);
     setPeriodYearId(period.academic_year_id);
@@ -462,6 +469,7 @@ export function AcademicWorkspace() {
   }
 
   function beginEditSubject(subject: Subject) {
+    setIsSubjectFormOpen(true);
     setEditingSubjectId(subject.id);
     setSubjectName(subject.name);
     setSubjectCode(subject.subject_code ?? "");
@@ -586,7 +594,7 @@ export function AcademicWorkspace() {
   if (isLoading) {
     return (
       <section className="rounded-xl border border-slate-200 bg-white p-6">
-        <p role="status">Loading your academic workspace…</p>
+        <p role="status">Loading your academic records…</p>
       </section>
     );
   }
@@ -596,6 +604,8 @@ export function AcademicWorkspace() {
       {errorMessage && <FormMessage kind="error">{errorMessage}</FormMessage>}
       {notice && <FormMessage kind="success">{notice}</FormMessage>}
 
+      {view === "workspace" && (
+        <>
       <section
         aria-labelledby="years-heading"
         className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
@@ -607,7 +617,9 @@ export function AcademicWorkspace() {
           Organize your subjects in the academic periods that work for you.
         </p>
 
-        <form className="mt-5 flex flex-wrap gap-3" onSubmit={handleYearSubmit}>
+        <details className="mt-5" open={isYearFormOpen} onToggle={(event) => setIsYearFormOpen(event.currentTarget.open)}>
+          <summary className="mb-3 w-fit cursor-pointer rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">{editingYearId ? "Edit academic year" : "Add an academic year"}</summary>
+        <form className="flex flex-wrap gap-3" onSubmit={handleYearSubmit}>
           <label className="sr-only" htmlFor="academic-year-name">
             Academic year name
           </label>
@@ -643,6 +655,7 @@ export function AcademicWorkspace() {
             </button>
           )}
         </form>
+        </details>
 
         {years.length === 0 ? (
           <p className="mt-5 rounded-lg bg-slate-50 p-4 text-sm text-slate-600">
@@ -776,8 +789,10 @@ export function AcademicWorkspace() {
         )}
 
         {years.length > 0 && (
+          <details className="mt-6" open={isPeriodFormOpen} onToggle={(event) => setIsPeriodFormOpen(event.currentTarget.open)}>
+          <summary className="mb-3 w-fit cursor-pointer rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">{editingPeriodId ? "Edit academic period" : "Add a period"}</summary>
           <form
-            className="mt-6 grid gap-3 rounded-lg border border-dashed border-slate-300 p-4 sm:grid-cols-2"
+            className="grid gap-3 rounded-lg border border-dashed border-slate-300 p-4 sm:grid-cols-2"
             onSubmit={handlePeriodSubmit}
           >
             <h3 className="font-medium sm:col-span-2">
@@ -876,6 +891,7 @@ export function AcademicWorkspace() {
               )}
             </div>
           </form>
+          </details>
         )}
       </section>
 
@@ -964,8 +980,10 @@ export function AcademicWorkspace() {
         )}
 
         {(currentPeriod || editingSubjectId) && (
+          <details className="mt-5" open={isSubjectFormOpen} onToggle={(event) => setIsSubjectFormOpen(event.currentTarget.open)}>
+          <summary className="mb-3 w-fit cursor-pointer rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">{editingSubjectId ? "Edit subject" : "Add a subject"}</summary>
           <form
-            className="mt-5 grid gap-3 rounded-lg border border-slate-200 p-4 sm:grid-cols-2"
+            className="grid gap-3 rounded-lg border border-slate-200 p-4 sm:grid-cols-2"
             onSubmit={handleSubjectSubmit}
           >
             <h3 className="font-medium sm:col-span-2">
@@ -1030,9 +1048,15 @@ export function AcademicWorkspace() {
                   : "Add subject"}
             </button>
           </form>
+          </details>
         )}
       </section>
 
+        </>
+      )}
+
+      {view === "archive" && (
+        <>
       <section
         aria-labelledby="archive-heading"
         className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
@@ -1226,6 +1250,9 @@ export function AcademicWorkspace() {
           </ul>
         )}
       </section>
+
+        </>
+      )}
 
       {deletion && (
         <DeletionDialog

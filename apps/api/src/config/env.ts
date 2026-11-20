@@ -15,6 +15,10 @@ export const envSchema = z
       (value) => (value === "" ? undefined : value),
       z.string().min(1).optional(),
     ),
+    SUPABASE_SERVICE_ROLE_KEY: z.preprocess(
+      (value) => (value === "" ? undefined : value),
+      z.string().min(1).optional(),
+    ),
   })
   .superRefine((env, context) => {
     if (Boolean(env.SUPABASE_URL) !== Boolean(env.SUPABASE_PUBLISHABLE_KEY)) {

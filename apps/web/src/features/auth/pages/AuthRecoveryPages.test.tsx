@@ -86,6 +86,7 @@ function renderRecoveryRoutes({
           element={<h1>Request reset screen</h1>}
         />
         <Route path="/sign-in" element={<h1>Sign-in screen</h1>} />
+        <Route path="/dashboard" element={<h1>Dashboard</h1>} />
       </Routes>
     </MemoryRouter>,
     { wrapper: TestAuthProvider },
@@ -180,6 +181,23 @@ describe("password recovery pages", () => {
       await screen.findByRole("heading", { name: "Request reset screen" }),
     ).not.toBeNull();
     expect(exchangeCodeForSession).toHaveBeenCalledWith("expired");
+  });
+
+  it("completes a successful OAuth callback and uses in-app navigation", async () => {
+    const exchangeCodeForSession = vi.fn().mockResolvedValue({
+      data: { session: emailSession },
+      error: null,
+    });
+    renderRecoveryRoutes({
+      initialPath: "/auth/callback?code=oauth-code",
+      exchangeCodeForSession,
+    });
+
+    expect(
+      await screen.findByRole("heading", { name: "Dashboard" }),
+    ).not.toBeNull();
+    expect(exchangeCodeForSession).toHaveBeenCalledWith("oauth-code");
+    expect(screen.queryByText(/localhost:5173/)).toBeNull();
   });
 
   it("treats a recovery callback without a code as invalid and offers a replacement link", async () => {

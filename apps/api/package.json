@@ -6,16 +6,22 @@
   "scripts": {
     "dev": "pnpm --filter @syllabussync/shared build && tsx watch src/server.ts",
     "dev:server": "tsx watch src/server.ts",
+    "dev:worker": "tsx watch src/worker.ts",
+    "worker": "node dist/worker.js",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run"
   },
   "dependencies": {
-    "@syllabussync/shared": "workspace:*",
+    "@napi-rs/canvas": "^1.1.1",
     "@supabase/supabase-js": "^2.57.4",
+    "@syllabussync/shared": "workspace:*",
+    "@tesseract.js-data/eng": "^1.0.0",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
+    "pdfjs-dist": "^6.5.438",
+    "tesseract.js": "^7.0.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {

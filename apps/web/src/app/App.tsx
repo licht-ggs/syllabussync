@@ -8,6 +8,11 @@ import { SignUpPage } from "../features/auth/pages/SignUpPage";
 import { VerificationPendingPage } from "../features/auth/pages/VerificationPendingPage";
 import { needsEmailVerification } from "../features/auth/auth-utils";
 import { DashboardPage } from "../features/dashboard/DashboardPage";
+import { TasksPage } from "../features/tasks/TasksPage";
+import { ArchivesPage } from "../features/dashboard/ArchivesPage";
+import { DocumentsPage } from "../features/documents/DocumentsPage";
+import { RequirementReviewPage } from "../features/documents/RequirementReviewPage";
+import { AppShell } from "./AppShell";
 
 function LoadingPage() {
   return (
@@ -21,34 +26,24 @@ function LoadingPage() {
 
 function PublicOnly() {
   const { isLoading, session } = useAuth();
-
-  if (isLoading) {
-    return <LoadingPage />;
-  }
-
+  if (isLoading) return <LoadingPage />;
   if (session) {
     return (
       <Navigate
         replace
-        to={needsEmailVerification(session.user) ? "/auth/verify" : "/dashboard"}
+        to={
+          needsEmailVerification(session.user) ? "/auth/verify" : "/dashboard"
+        }
       />
     );
   }
-
   return <Outlet />;
 }
 
 function RequireAuth() {
   const { isLoading, session } = useAuth();
-
-  if (isLoading) {
-    return <LoadingPage />;
-  }
-
-  if (!session) {
-    return <Navigate replace to="/sign-in" />;
-  }
-
+  if (isLoading) return <LoadingPage />;
+  if (!session) return <Navigate replace to="/sign-in" />;
   if (needsEmailVerification(session.user)) {
     return (
       <Navigate
@@ -58,21 +53,13 @@ function RequireAuth() {
       />
     );
   }
-
   return <Outlet />;
 }
 
 function RootRedirect() {
   const { isLoading, session } = useAuth();
-
-  if (isLoading) {
-    return <LoadingPage />;
-  }
-
-  if (!session) {
-    return <Navigate replace to="/sign-in" />;
-  }
-
+  if (isLoading) return <LoadingPage />;
+  if (!session) return <Navigate replace to="/sign-in" />;
   return (
     <Navigate
       replace
@@ -93,7 +80,18 @@ export function App() {
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
       <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
       <Route element={<RequireAuth />}>
-        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route element={<AppShell />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/tasks" element={<TasksPage />} />
+          <Route path="/tasks/:taskId" element={<TasksPage />} />
+          <Route path="/tasks/:taskId/edit" element={<TasksPage />} />
+          <Route path="/archives" element={<ArchivesPage />} />
+          <Route path="/documents" element={<DocumentsPage />} />
+          <Route
+            path="/documents/:documentId/review"
+            element={<RequirementReviewPage />}
+          />
+        </Route>
       </Route>
       <Route path="*" element={<RootRedirect />} />
     </Routes>

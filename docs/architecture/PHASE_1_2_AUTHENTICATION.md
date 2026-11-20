@@ -85,12 +85,17 @@ and [email_identity_on_password_test.go](https://github.com/supabase/auth/blob/1
 
 ## External setup
 
-The local Supabase config enables only the Google OAuth provider, uses
-environment references for its Client ID and Client Secret, and allows the
-Vite callback at `http://localhost:5173/auth/callback`. Google Cloud Console
-must authorize `http://localhost:5173` as a JavaScript origin and
-`http://127.0.0.1:54321/auth/v1/callback` as the redirect URI for the local
-Supabase Auth service.
+The local Supabase config enables only the Google OAuth provider and uses
+environment references for its Client ID and Client Secret. For WSL2 access
+from Windows, set the local Auth `site_url` to the current WSL frontend origin
+and allow its exact `/auth/callback`, `?flow=signup`, and `?flow=recovery`
+URLs; the localhost equivalents may remain enabled for local-browser access.
+The app constructs callback URLs from `window.location.origin`. Google Cloud
+Console must authorize the frontend origin used by the browser as a
+JavaScript origin and `http://127.0.0.1:54321/auth/v1/callback` as the
+redirect URI for the local Supabase Auth service. GoTrue falls back to
+`site_url` when a requested redirect is not accepted, so the effective local
+Auth configuration must be reloaded after changing `supabase/config.toml`.
 
 Hosted Google credentials, email-confirmation policy, site URL, callback
 redirect allowlist, and confirmation/recovery templates remain separate

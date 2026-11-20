@@ -253,7 +253,10 @@ function createFakeApi(initialWorkspace = createWorkspace()) {
   };
 }
 
-function renderWorkspace(api: ReturnType<typeof createFakeApi>) {
+function renderWorkspace(
+  api: ReturnType<typeof createFakeApi>,
+  view: "workspace" | "archive" = "workspace",
+) {
   const value: AuthContextValue = {
     client: null,
     configurationError: null,
@@ -266,7 +269,7 @@ function renderWorkspace(api: ReturnType<typeof createFakeApi>) {
   vi.stubGlobal("fetch", api.fetchMock);
   return render(
     <AuthContext.Provider value={value}>
-      <AcademicWorkspace />
+      <AcademicWorkspace view={view} />
     </AuthContext.Provider>,
   );
 }
@@ -293,6 +296,17 @@ describe("AcademicWorkspace", () => {
     expect(
       screen.getByText("Create an academic period to get started."),
     ).not.toBeNull();
+  });
+
+  it("retains an academic-year draft when its form is collapsed", async () => {
+    const api = createFakeApi({ academic_years: [], academic_periods: [], subjects: [], current_academic_period_id: null });
+    renderWorkspace(api);
+    await screen.findByText(/No school or institution details/);
+    fireEvent.change(screen.getByLabelText("Academic year name"), { target: { value: "Draft 2028–2029" } });
+    const disclosure = screen.getByText("Add an academic year");
+    fireEvent.click(disclosure);
+    fireEvent.click(disclosure);
+    expect(screen.getByLabelText("Academic year name")).toHaveProperty("value", "Draft 2028–2029");
   });
 
   it("creates and edits academic years", async () => {
@@ -412,6 +426,9 @@ describe("AcademicWorkspace", () => {
 
     fireEvent.click(screen.getAllByRole("button", { name: "Archive" })[0]!);
     expect(await screen.findByText("Academic period archived.")).not.toBeNull();
+    cleanup();
+    renderWorkspace(api, "archive");
+    await screen.findByRole("heading", { name: "Archive" });
     expect(screen.getByText("Biology")).not.toBeNull();
     expect(screen.getByText("Individually archived")).not.toBeNull();
 
@@ -426,6 +443,8 @@ describe("AcademicWorkspace", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Academic periods" }));
     fireEvent.click(screen.getByRole("button", { name: "Restore period" }));
+    cleanup();
+    renderWorkspace(api);
     expect(
       await screen.findByText(/Choose a period to make it current/),
     ).not.toBeNull();
@@ -434,6 +453,9 @@ describe("AcademicWorkspace", () => {
       api.getWorkspace().subjects.find((item) => item.id === otherSubjectId)
         ?.is_active,
     ).toBe(false);
+    cleanup();
+    renderWorkspace(api, "archive");
+    await screen.findByRole("heading", { name: "Archive" });
     fireEvent.click(screen.getByRole("button", { name: "Subjects" }));
     expect(screen.getByText("Individually archived")).not.toBeNull();
     expect(screen.queryByText("Biology")).toBeNull();
@@ -450,8 +472,10 @@ describe("AcademicWorkspace", () => {
       api.getWorkspace().subjects.find((item) => item.id === otherSubjectId)
         ?.is_active,
     ).toBe(true);
+    cleanup();
+    renderWorkspace(api);
     expect(
-      screen.getByText(/Choose a period to make it current/),
+      await screen.findByText(/Choose a period to make it current/),
     ).not.toBeNull();
   });
 
@@ -460,7 +484,7 @@ describe("AcademicWorkspace", () => {
     archivedWorkspace.academic_periods[0]!.archived_at = timestamp;
     archivedWorkspace.current_academic_period_id = null;
     const api = createFakeApi(archivedWorkspace);
-    renderWorkspace(api);
+    renderWorkspace(api, "archive");
     await screen.findByText("Biology");
 
     vi.useFakeTimers();
@@ -546,7 +570,7 @@ describe("AcademicWorkspace", () => {
       }
       return originalFetch?.(input, init) ?? jsonResponse({});
     });
-    renderWorkspace(api);
+    renderWorkspace(api, "archive");
     await screen.findByText("Biology");
 
     vi.useFakeTimers();

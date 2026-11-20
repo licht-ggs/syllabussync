@@ -16,8 +16,10 @@ Express API, and a small shared package.
   environment-specific behavior.
 - Supabase provides PostgreSQL and Auth. Profile rows are keyed by
   `auth.users.id`, created by an Auth trigger, and restricted by RLS.
-  Academic years, periods, subjects, and workspace settings are owner-scoped;
-  protected mutations are enforced by database functions and constraints.
+  Academic years, periods, subjects, workspace settings, tasks, and task
+  history are owner-scoped; protected mutations are enforced by database
+  functions and constraints. Task deadlines preserve date, local time,
+  timezone, and resolved instant separately.
 - Future Python/OpenCV and AI/OCR work belongs in separately deployed,
   asynchronous processing services rather than the request-serving API.
 
@@ -25,3 +27,5 @@ Authentication routes and the profile foundation are described in
 [PHASE_1_2_AUTHENTICATION.md](./PHASE_1_2_AUTHENTICATION.md). The Phase 1.3
 academic workspace schema and request flow are described in
 [PHASE_1_3_ACADEMIC_WORKSPACE.md](./PHASE_1_3_ACADEMIC_WORKSPACE.md).
+The Phase 1.4 database foundation is described in
+[PHASE_1_4_DATABASE.md](./PHASE_1_4_DATABASE.md).

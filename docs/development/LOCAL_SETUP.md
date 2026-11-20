@@ -47,10 +47,26 @@ to hosted Supabase; do not treat code-level checks as database verification.
 
 ### Local Google OAuth
 
-The local Supabase configuration enables Google OAuth and uses
-`http://localhost:5173` as its Auth site URL. It allows the callback URLs for
-the current Vite origin, including signup and recovery callback flows. The
-Google provider's Client ID and Client Secret are read only by the local
+The local Supabase configuration enables Google OAuth. When accessing Vite
+from Windows through WSL2, set `auth.site_url` in `supabase/config.toml` to
+the current WSL IP origin (for example, `http://172.18.131.69:5173`) and
+include the exact `/auth/callback`, `?flow=signup`, and `?flow=recovery`
+callback URLs for that origin in `auth.additional_redirect_urls`. The app
+builds these callback URLs from the browser's current origin; do not hardcode a
+WSL IP in application code. Keep the localhost callback entries too if local
+browsers also access the app through localhost.
+
+`site_url` is GoTrue's fallback when the requested redirect is not accepted.
+Seeing the correct `redirect_to` in the browser's initial authorize request
+only confirms what the client sent; it does not prove that the running local
+Auth service loaded the corresponding allow-list. After changing
+`supabase/config.toml`, stop and start the local Supabase stack from the
+repository root so the CLI regenerates service configuration. Do not reset
+the database. Check that the local Auth service is responding and then retry
+the OAuth flow; the callback must return to the requested `/auth/callback`
+URL, not the `site_url` root.
+
+The Google provider's Client ID and Client Secret are read only by the local
 Supabase CLI process through these environment variables:
 
 - `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID`
@@ -68,13 +84,10 @@ printf '\n'
 export SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET
 ```
 
-After changing `supabase/config.toml`, restart the local stack for the
-configuration to take effect. Do not reset the local database just to enable
-OAuth.
-
 In Google Cloud Console, configure the OAuth client as a **Web application**:
 
-- Authorized JavaScript origin: `http://localhost:5173`
+- Authorized JavaScript origin: the frontend origin used by the browser
+  (for example, `http://172.18.131.69:5173`)
 - Authorized redirect URI: `http://127.0.0.1:54321/auth/v1/callback`
 
 The Google redirect URI is the local Supabase Auth callback, not the Vite
